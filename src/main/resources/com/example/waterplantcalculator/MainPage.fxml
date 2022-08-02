@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.waterplantcalculator.MainPageController">
+   <children>
+      <CubicCurve controlX1="297.9999694824219" controlX2="306.6666564941406" controlY1="285.33331298828125" controlY2="285.33331298828125" endX="342.6666564941406" endY="-30.666656494140625" fill="#ffffff00" layoutX="2.0" layoutY="299.0" startX="79.66666412353516" startY="285.33331298828125" stroke="#4b5c6b" strokeMiterLimit="0.0" strokeWidth="10.0" />
+      <CubicCurve controlX1="306.6666564941406" controlX2="273.6666564941406" controlY1="280.33331298828125" controlY2="280.33331298828125" endX="212.55856323242188" endY="-31.499969482421875" fill="#ffffff00" layoutX="199.0" layoutY="297.0" startX="433.66668701171875" startY="287.33331298828125" stroke="#4b5c6b" strokeMiterLimit="0.0" strokeWidth="10.0" />
+      <Pane layoutX="284.0" layoutY="43.0" prefHeight="248.0" prefWidth="204.0">
+         <children>
+            <TextField fx:id="clearWellHeightTxtBox" layoutX="49.0" layoutY="30.0" prefWidth="100.0" />
+            <Rectangle fx:id="clearWellWater" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="170.0" layoutX="49.0" layoutY="63.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+            <Rectangle fx:id="clearWellAir" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="150.0" layoutX="49.0" layoutY="63.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+            <Label fx:id="clearWellMinLbl" layoutX="111.0" layoutY="214.0" text="99.9 ft" />
+            <Label layoutX="62.0" layoutY="122.0" text="Clear Well">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <Label fx:id="clearWellMaxLbl" layoutX="112.0" layoutY="63.0" text="99.9 ft" />
+            <Label layoutX="58.0" layoutY="12.0" text="Water Height">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+         </children></Pane>
+      <Pane layoutX="100.0" layoutY="31.0" prefHeight="200.0" prefWidth="235.0">
+         <children>
+            <Rectangle fx:id="inputPipeWater" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="30.0" layoutX="113.0" layoutY="75.0" stroke="BLACK" strokeType="INSIDE" width="120.0" />
+            <Rectangle fx:id="inputPipeAir" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="25.0" layoutX="113.0" layoutY="75.0" stroke="BLACK" strokeType="INSIDE" width="120.0" />
+            <Label layoutX="-8.0" layoutY="54.0" text="Input Volume">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <TextField fx:id="inputVolumeTxtBox" layoutX="10.0" layoutY="78.0" prefWidth="50.0" />
+            <Label fx:id="inputMaxLbl" layoutX="71.0" layoutY="71.0" text="9.9 MGD">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+            <Label fx:id="inputMinLbl" layoutX="71.0" layoutY="93.0" text="9.9 MGD">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+         </children></Pane>
+      <Pane layoutY="393.0" prefHeight="200.0" prefWidth="150.0">
+         <children>
+            <Rectangle fx:id="tower1Water" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="80.0" layoutX="38.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle fx:id="tower1Air" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="60.0" layoutX="38.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4b5c6b" height="60.0" layoutX="71.0" layoutY="140.0" stroke="BLACK" strokeType="INSIDE" width="15.0" />
+            <Label fx:id="tower1MaxLbl" layoutX="4.0" layoutY="60.0" text="99 ft" />
+            <Label fx:id="tower1MinLbl" layoutX="4.0" layoutY="123.0" text="99 ft" />
+            <Label layoutX="51.0" layoutY="10.0" text="7th St">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <TextField fx:id="tower1HeightTxt" layoutX="10.0" layoutY="35.0" prefWidth="100.0" />
+            <Label layoutX="71.0" layoutY="73.0" text="1">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button layoutX="110.0" layoutY="35.0" mnemonicParsing="false" onAction="#onActionAcceptTower1" text="OK" />
+            <ChoiceBox fx:id="choiceTower1Measurements" layoutX="8.0" layoutY="145.0" prefWidth="50.0" />
+            <Label fx:id="tower1TimeToDoneLbl" layoutX="22.0" layoutY="-5.0" text="Minutes Until Full ??" />
+         </children>
+      </Pane>
+      <Pane layoutX="150.0" layoutY="393.0" prefHeight="200.0" prefWidth="150.0">
+         <children>
+            <Rectangle fx:id="tower2Water" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="80.0" layoutX="35.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle fx:id="tower2Air" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="60.0" layoutX="35.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4b5c6b" height="60.0" layoutX="68.0" layoutY="140.0" stroke="BLACK" strokeType="INSIDE" width="15.0" />
+            <Label fx:id="tower2MaxLbl" layoutX="1.0" layoutY="60.0" text="99 ft" />
+            <Label fx:id="tower2MinLbl" layoutX="1.0" layoutY="123.0" text="99 ft" />
+            <Label layoutX="45.0" layoutY="10.0" text="17th St">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <TextField fx:id="tower2HeightTxt" layoutX="1.0" layoutY="35.0" prefWidth="100.0" />
+            <Label layoutX="71.0" layoutY="74.0" text="2">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button layoutX="101.0" layoutY="35.0" mnemonicParsing="false" onAction="#onActionAcceptTower2" text="OK" />
+            <ChoiceBox fx:id="choiceTower2Measurements" layoutX="7.0" layoutY="146.0" prefWidth="50.0" />
+            <Label fx:id="tower2TimeToDoneLbl" layoutX="22.0" layoutY="-3.0" text="Minutes Until Full ??" />
+         </children>
+      </Pane>
+      <Pane layoutX="553.0" layoutY="400.0" prefHeight="200.0" prefWidth="150.0">
+         <children>
+            <Rectangle fx:id="tower3Water" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="80.0" layoutX="39.0" layoutY="52.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle fx:id="tower3Air" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="60.0" layoutX="39.0" layoutY="52.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4b5c6b" height="60.0" layoutX="72.0" layoutY="132.0" stroke="BLACK" strokeType="INSIDE" width="15.0" />
+            <Label fx:id="tower3MaxLbl" layoutX="5.0" layoutY="52.0" text="99 ft" />
+            <Label fx:id="tower3MinLbl" layoutX="5.0" layoutY="115.0" text="99 ft" />
+            <Label layoutX="50.0" layoutY="2.0" text="42nd St">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <TextField fx:id="tower3HeightTxt" layoutX="4.0" layoutY="27.0" prefWidth="100.0" />
+            <Label layoutX="73.0" layoutY="64.0" text="3">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button layoutX="104.0" layoutY="27.0" mnemonicParsing="false" onAction="#onActionAcceptTower3" text="OK" />
+            <ChoiceBox fx:id="choiceTower3Measurements" layoutX="12.0" layoutY="138.0" prefWidth="50.0" />
+         </children>
+      </Pane>
+      <TextField fx:id="westOutputTxt" layoutX="176.0" layoutY="300.0" />
+      <TextField fx:id="eastOutputTxt" layoutX="432.0" layoutY="300.0" />
+      <Label layoutX="184.0" layoutY="277.0" text="West Output Volume">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="445.0" layoutY="278.0" text="East Output Volume">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label fx:id="westOutputMaxLbl" layoutX="135.0" layoutY="296.0" text="9.9 MGD">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Label fx:id="westOutputMinLbl" layoutX="134.0" layoutY="314.0" text="9.9 MGD">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Label fx:id="eastOutputMaxLbl" layoutX="583.0" layoutY="297.0" text="9.9 MGD">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Label fx:id="eastOutputMinLbl" layoutX="583.0" layoutY="313.0" text="9.9 MGD">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Button layoutX="490.0" layoutY="79.0" mnemonicParsing="false" onAction="#onActionCalculateClearWell" text="Calculate">
+         <font>
+            <Font size="24.0" />
+         </font></Button>
+      <Label fx:id="clearWellTimeLeftTxt" layoutX="474.0" layoutY="182.0" text="Time Until Full">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="tower3TimeToDoneLbl" layoutX="583.0" layoutY="389.0" text="Minutes Until Full ??" />
+   </children>
+</Pane>
