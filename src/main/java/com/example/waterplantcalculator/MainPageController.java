@@ -27,6 +27,7 @@ public class MainPageController implements Initializable {
     Double clearWellVolume = 7.0;
     Double clearWellPerFoot = (clearWellVolume / clearWellMaximum);
     //West highlifts
+    Double pumpTimeLeftInMinutes = 0.0;
     Double westOutputMin = 0.0;
     Double westVolumeCurrent = 0.0;
     Double westOutputMax = 9.9;
@@ -40,10 +41,12 @@ public class MainPageController implements Initializable {
     Double tower1Current = 0.0;
     Double tower1Minimum = 15.0;
     //Tower 2
+    Double tower2SecondsTillDone = 0.0;
     Double tower2Maximum = 29.5;
     Double tower2Current = 0.0;
     Double tower2Minimum = 15.0;
     //Tower 3
+    Double tower3SecondsTillDone = 0.0;
     Double tower3Maximum = 29.5;
     Double tower3Current = 0.0;
     Double tower3Minimum = 14.0;
@@ -73,8 +76,8 @@ public class MainPageController implements Initializable {
 
     @FXML
     private TextField tower3HeightTxt;
-
-
+    @FXML
+    private TextField pumpTimeLeftTxt;
     @FXML
     private Rectangle clearWellAir;
 
@@ -152,57 +155,55 @@ public class MainPageController implements Initializable {
     private Label tower2TimeToDoneLbl;
     @FXML
     private Label tower3TimeToDoneLbl;
-
-
-    @FXML
-    private ComboBox comboTower1Measurements;
     @FXML
     private ChoiceBox<Measurement> choiceTower1Measurements;
     @FXML
     private ChoiceBox<Measurement> choiceTower2Measurements;
     @FXML
     private ChoiceBox<Measurement> choiceTower3Measurements;
-
     @FXML
     protected void onActionCalculateClearWell(){
         checkClearWellHeight();
         checkInputVolume();
         checkEastOutput();
         checkWestOutput();
+        checkPumpTimeLeft();
         clearWellTimeLeftTxt.setText("Time Until Full\n??? Minutes");
-        if (checkWestOutput() && checkEastOutput() && checkInputVolume() && checkClearWellHeight()){
+        if (checkWestOutput() && checkEastOutput() && checkInputVolume() && checkClearWellHeight() && checkPumpTimeLeft()){
             Double netFlow =((inputVolumeCurrent - (westVolumeCurrent + eastVolumeCurrent)) / 1440);
-            if (netFlow >= 0){
-                int timeUntilFull = (int)(((clearWellMaximum - clearWellCurrent) * clearWellPerFoot) / (netFlow));
-                clearWellTimeLeftTxt.setText("Time Until Full\n " + timeUntilFull + " Minutes");
+            if (pumpTimeLeftInMinutes < 1) {
+                System.out.println("Pump time less than 1");
+                if (netFlow >= 0){
+                    System.out.println("netflow greater equal 0");
+                    int timeUntilFull = (int)(((clearWellMaximum - clearWellCurrent) * clearWellPerFoot) / (netFlow));
+                    clearWellTimeLeftTxt.setText("Time Until Full\n " + timeUntilFull + " Minutes");
+                } else {
+                    System.out.println("netflow less than 0");
+                    int timeUntilEmpty = (int)(((clearWellCurrent - clearWellMinimum) * clearWellPerFoot) / -(netFlow));
+                    clearWellTimeLeftTxt.setText("Time Until Empty\n " + timeUntilEmpty + " Minutes");
+                }
             } else {
-                int timeUntilEmpty = (int)(((clearWellCurrent - clearWellMinimum) * clearWellPerFoot) / -(netFlow));
-                clearWellTimeLeftTxt.setText("Time Until Empty\n " + timeUntilEmpty + " Minutes");
-
+                System.out.println("Pump time greater than 1");
+                if (netFlow >= 0) {
+                    System.out.println("netflow greater equal 0");
+                    if ((netFlow * pumpTimeLeftInMinutes / 1440) > ((clearWellCurrent - clearWellMinimum) * clearWellPerFoot)){
+                        System.out.println("full before pump done");
+                        int timeUntilFull = (int)(((clearWellCurrent - clearWellMinimum) * clearWellPerFoot) / netFlow);
+                        clearWellTimeLeftTxt.setText("Time Until Full\n " + timeUntilFull + " Minutes");
+                    } else {
+                        System.out.println("Not full before pump done");
+                        int timeUntilFull = (int)((((clearWellMaximum - clearWellCurrent) * clearWellPerFoot) - (netFlow * pumpTimeLeftInMinutes)) / (inputVolumeCurrent / 1440));
+                        timeUntilFull = timeUntilFull + (int)Math.round(pumpTimeLeftInMinutes);
+                        clearWellTimeLeftTxt.setText("Time Until Full\n " + timeUntilFull + " Minutes");
+                    }
+                } else {
+                    System.out.println("netflow less than 0");
+                    int timeUntilFull = (int)(((clearWellMaximum - clearWellCurrent) * clearWellPerFoot) / (inputVolumeCurrent / 1440));
+                    timeUntilFull = timeUntilFull + (int)(((westVolumeCurrent + eastVolumeCurrent) * pumpTimeLeftInMinutes) / inputVolumeCurrent);
+                    clearWellTimeLeftTxt.setText("Time Until Full\n " + timeUntilFull + " Minutes");
+                }
             }
-
-
-
         }
-            /*
-             && checkInputVolume() && checkEastOutput() && checkWestOutput())
-
-             Double heightInput = Double.parseDouble(clearWellHeightTxtBox.getText());
-             Double eastOutput = Double.parseDouble(eastOutputTxt.getText());
-             Double westOutput = Double.parseDouble(westOutputTxt.getText());
-             Double input = Double.parseDouble(inputVolumeTxtBox.getText());
-             if (heightInput > (eastOutput + westOutput)){
-             String outputTime = String.valueOf(((clearWellMaximum - heightInput) * clearWellPerFoot) / (input - (eastOutput + westOutput)));
-             clearwellTimeLeftLbl.setText(outputTime + " Hours until full");
-             } else {
-             String outputTime = String.valueOf(((heightInput - clearWellMinimum) * clearWellPerFoot) / ((eastOutput + westOutput) - input));
-             clearwellTimeLeftLbl.setText(outputTime + " Hours until empty");
-             }
-             */
-
-
-
-
     }
     private boolean checkClearWellHeight() {
         Double inputHeight = null;
@@ -274,7 +275,7 @@ public class MainPageController implements Initializable {
                     alert.setTitle("East flow to high/low");
                     alert.setHeaderText("East flow must be set between " + eastOutputMin + " and " + eastOutputMax);
                     alert.showAndWait();
-                    eastOutputTxt.setText("");
+                    eastOutputTxt.setText("0.0");
                     return false;
                 }
                 eastOutputTxt.setText(eastVolume.toString());
@@ -282,7 +283,7 @@ public class MainPageController implements Initializable {
                 return true;
             }
         }
-        eastOutputTxt.setText("");
+        eastOutputTxt.setText("0.0");
         return false;
     }
     private boolean checkWestOutput() {
@@ -299,7 +300,7 @@ public class MainPageController implements Initializable {
                     alert.setTitle("West flow to high/low");
                     alert.setHeaderText("West flow must be set between " + westOutputMin + " and " + westOutputMax);
                     alert.showAndWait();
-                    westOutputTxt.setText("");
+                    westOutputTxt.setText("0.0");
                     return false;
                 }
                 westOutputTxt.setText(westVolume.toString());
@@ -307,8 +308,34 @@ public class MainPageController implements Initializable {
                 return true;
             }
         }
-        westOutputTxt.setText("");
+        westOutputTxt.setText("0.0");
         return false;
+    }
+    private boolean checkPumpTimeLeft(){
+        if (pumpTimeLeftTxt.getText().isEmpty()) {
+            pumpTimeLeftTxt.setText("0.0");
+            pumpTimeLeftInMinutes = 0.0;
+            return true;
+        }
+        Double timeLeft = 0.0;
+        try {
+            timeLeft = Double.parseDouble(pumpTimeLeftTxt.getText());
+        } catch (NumberFormatException e) {
+        } catch (NullPointerException e) {
+        }
+        if (timeLeft < 0.0){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Time left on pumps cannot be negative.");
+            alert.setHeaderText("Approximate pump time left in minutes must be set to a positive number");
+            alert.showAndWait();
+            pumpTimeLeftTxt.setText("0.0");
+            return false;
+        } else {
+            pumpTimeLeftTxt.setText(timeLeft.toString());
+            pumpTimeLeftInMinutes = timeLeft;
+            return true;
+        }
+
     }
     @FXML
     protected boolean onActionAcceptTower1(){
@@ -334,14 +361,16 @@ public class MainPageController implements Initializable {
                 alert.setHeaderText("Please Confirm Tower 1 is currently reading " + inputHeight + " ft");
                 alert.showAndWait();
 
-
-                tower1HeightTxt.setText(inputHeight.toString());
-                tower1Current = inputHeight;
-                Double towerpercent = ((inputHeight - tower1Minimum)/(tower1Maximum - tower1Minimum));
-                tower1.setPercent(towerpercent);
-                choiceTower1Measurements.getItems().add(new Measurement(tower1Current, towerpercent, LocalDateTime.now()));
-                predictTower1();
-                return true;
+                if (alert.getResult() == ButtonType.OK) {
+                    tower1HeightTxt.setText(inputHeight.toString());
+                    tower1Current = inputHeight;
+                    Double towerpercent = ((inputHeight - tower1Minimum)/(tower1Maximum - tower1Minimum));
+                    tower1.setPercent(towerpercent);
+                    choiceTower1Measurements.getItems().add(new Measurement(tower1Current, towerpercent, LocalDateTime.now()));
+                    predictTower1();
+                    return true;
+                }
+                return false;
             }
         }
         tower1.setPercent(0.0);
@@ -366,12 +395,21 @@ public class MainPageController implements Initializable {
                     tower2HeightTxt.setText("");
                     return false;
                 }
-                tower2HeightTxt.setText(inputHeight.toString());
-                tower2Current = inputHeight;
-                Double towerpercent = ((inputHeight - tower2Minimum)/(tower2Maximum - tower2Minimum));
-                tower2.setPercent(towerpercent);
-                choiceTower2Measurements.getItems().add(new Measurement(tower2Current, towerpercent, LocalDateTime.now()));
-                return true;
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Tower 1 Accept Reading");
+                alert.setHeaderText("Please Confirm Tower 1 is currently reading " + inputHeight + " ft");
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.OK) {
+                    tower2HeightTxt.setText(inputHeight.toString());
+                    tower2Current = inputHeight;
+                    Double towerpercent = ((inputHeight - tower2Minimum)/(tower2Maximum - tower2Minimum));
+                    tower2.setPercent(towerpercent);
+                    choiceTower2Measurements.getItems().add(new Measurement(tower2Current, towerpercent, LocalDateTime.now()));
+                    predictTower2();
+                    return true;
+                }
+                return false;
             }
         }
         tower2.setPercent(0.0);
@@ -397,19 +435,28 @@ public class MainPageController implements Initializable {
                     tower3HeightTxt.setText("");
                     return false;
                 }
-                tower3HeightTxt.setText(inputHeight.toString());
-                tower3Current = inputHeight;
-                Double towerpercent = ((inputHeight - tower3Minimum)/(tower3Maximum - tower3Minimum));
-                tower3.setPercent(towerpercent);
-                choiceTower3Measurements.getItems().add(new Measurement(tower3Current, towerpercent, LocalDateTime.now()));
-                return true;
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Tower 1 Accept Reading");
+                alert.setHeaderText("Please Confirm Tower 1 is currently reading " + inputHeight + " ft");
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.OK) {
+                    tower3HeightTxt.setText(inputHeight.toString());
+                    tower3Current = inputHeight;
+                    Double towerpercent = ((inputHeight - tower3Minimum)/(tower3Maximum - tower3Minimum));
+                    tower3.setPercent(towerpercent);
+                    choiceTower3Measurements.getItems().add(new Measurement(tower3Current, towerpercent, LocalDateTime.now()));
+                    predictTower3();
+                    return true;
+                }
+
+                return false;
             }
         }
         tower3.setPercent(0.0);
         tower3HeightTxt.setText("");
         return false;
     }
-
     public void predictTower1(){
         int index = choiceTower1Measurements.getItems().size();
         if (index > 1){
@@ -431,16 +478,64 @@ public class MainPageController implements Initializable {
 
                 tower1TimeToDoneLbl.setText("Minutes Until Empty: " + (int)(secondsToGo / 60));
             }
-
-
+        }
+    }
+    public void predictTower2(){
+        int index = choiceTower2Measurements.getItems().size();
+        if (index > 1){
+            Measurement newest = choiceTower2Measurements.getItems().get(index - 1);
+            Measurement older = choiceTower2Measurements.getItems().get(index - 2);
+            if (newest.getHeight() >= older.getHeight()){
+                Double oldVol = volumeOfSphereAtHeight(15, tower2Maximum - older.getHeight());
+                Double newVol = volumeOfSphereAtHeight(15, tower2Maximum - tower2Current);
+                Double unitsPerSecond = (oldVol - newVol) / (older.getTime().until(newest.getTime(), ChronoUnit.SECONDS));
+                Double secondsToGo = newVol / unitsPerSecond;
+                tower2SecondsTillDone = secondsToGo;
+                tower2TimeToDoneLbl.setText("Minutes Until Full: " + (int)(tower2SecondsTillDone / 60));
+            } else {
+                Double oldVol = volumeOfSphereAtHeight(15, tower2Maximum - older.getHeight());
+                Double newVol = volumeOfSphereAtHeight(15, tower2Maximum - tower2Current);
+                Double unitsPerSecond = (newVol - oldVol) / (older.getTime().until(newest.getTime(), ChronoUnit.SECONDS));
+                Double secondsToGo = (volumeOfSphereAtHeight(15, 15) - newVol) / unitsPerSecond;
+                tower2SecondsTillDone = null;
+                tower2TimeToDoneLbl.setText("Minutes Until Empty: " + (int)(secondsToGo / 60));
+            }
+        }
+    }
+    public void predictTower3(){
+        int index = choiceTower3Measurements.getItems().size();
+        if (index > 1){
+            Measurement newest = choiceTower3Measurements.getItems().get(index - 1);
+            Measurement older = choiceTower3Measurements.getItems().get(index - 2);
+            if (newest.getHeight() >= older.getHeight()){
+                Double oldVol = volumeOfOddSphereAtHeight(15, tower3Maximum - older.getHeight());
+                Double newVol = volumeOfOddSphereAtHeight(15, tower3Maximum - tower3Current);
+                Double unitsPerSecond = (oldVol - newVol) / (older.getTime().until(newest.getTime(), ChronoUnit.SECONDS));
+                Double secondsToGo = newVol / unitsPerSecond;
+                tower3SecondsTillDone = secondsToGo;
+                tower3TimeToDoneLbl.setText("Minutes Until Full: " + (int)(tower3SecondsTillDone / 60));
+            } else {
+                Double oldVol = volumeOfOddSphereAtHeight(15, tower3Maximum - older.getHeight());
+                Double newVol = volumeOfOddSphereAtHeight(15, tower3Maximum - tower3Current);
+                Double unitsPerSecond = (newVol - oldVol) / (older.getTime().until(newest.getTime(), ChronoUnit.SECONDS));
+                Double secondsToGo = (volumeOfOddSphereAtHeight(15, 15) - newVol) / unitsPerSecond;
+                tower3SecondsTillDone = null;
+                tower3TimeToDoneLbl.setText("Minutes Until Empty: " + (int)(secondsToGo / 60));
+            }
         }
     }
 
-
     public Double volumeOfSphereAtHeight(int rad, double height){
         Double top = (Math.PI/3) * height * height * ((3 * rad) - height);
+        System.out.println(top);
         return top;
     }
+    public Double volumeOfOddSphereAtHeight(int rad, double height){
+        Double top = ((Math.PI/3) * height * height * ((3 * rad) - height)) + (Math.PI * rad * height);
+        System.out.println(top);
+        return top;
+    }
+
     public void initialize(URL url, ResourceBundle resourceBundle) {
         inputPipe = new WaterFilledRectangle(inputPipeAir, inputPipeWater);
         clearWell = new WaterFilledRectangle(clearWellAir, clearWellWater);
